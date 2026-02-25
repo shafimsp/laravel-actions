@@ -7,6 +7,7 @@ namespace ShafiMsp\Actions\Middleware;
 use Closure;
 use ShafiMsp\Actions\Attributes\Cacheable;
 use ShafiMsp\Actions\Contracts\Action;
+use ShafiMsp\Actions\Contracts\Cacheable as CacheableContract;
 use ShafiMsp\Actions\Contracts\Middleware;
 use Illuminate\Support\Facades\Cache;
 use ReflectionClass;
@@ -14,8 +15,9 @@ use ReflectionClass;
 /**
  * Middleware to cache query results.
  *
- * This middleware caches query results for queries marked with the Cacheable attribute.
- * The cache key is generated based on the query class and its parameters.
+ * This middleware caches query results for queries that either implement
+ * the Cacheable contract or are marked with the Cacheable attribute.
+ * The contract takes priority over the attribute.
  */
 final class CacheMiddleware implements Middleware
 {
@@ -30,14 +32,13 @@ final class CacheMiddleware implements Middleware
      */
     public function handle(Action $action, Closure $next): mixed
     {
-        $cacheableAttribute = $this->getCacheableAttribute($action);
+        $cacheConfig = $this->resolveCacheConfig($action);
 
-        if (! $cacheableAttribute instanceof Cacheable) {
+        if ($cacheConfig === null) {
             return $next($action);
         }
 
-        $cacheKey = $this->generateCacheKey($action, $cacheableAttribute);
-        $ttl = $cacheableAttribute->ttl;
+        [$cacheKey, $ttl] = $cacheConfig;
 
         $freshTtl = $ttl;
         $storageTtl = $ttl * 3;
@@ -50,6 +51,31 @@ final class CacheMiddleware implements Middleware
         }
 
         return Cache::flexible($cacheKey, [$freshTtl, $storageTtl], $callback, $lock);
+    }
+
+    /**
+     * Resolve cache configuration from the action.
+     *
+     * Priority: Cacheable contract > #[Cacheable] attribute > null (skip).
+     *
+     * @template TReturn
+     *
+     * @param  Action<TReturn>  $action
+     * @return array{0: string, 1: int}|null [cacheKey, ttl] or null if not cacheable
+     */
+    private function resolveCacheConfig(Action $action): ?array
+    {
+        if ($action instanceof CacheableContract) {
+            return [$action->cacheKey(), $action->cacheTtl()];
+        }
+
+        $attribute = $this->getCacheableAttribute($action);
+
+        if (! $attribute instanceof Cacheable) {
+            return null;
+        }
+
+        return [$this->generateCacheKey($action, $attribute), $attribute->ttl];
     }
 
     /**
