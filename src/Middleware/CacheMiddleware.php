@@ -32,7 +32,8 @@ final class CacheMiddleware implements Middleware
      */
     public function handle(Action $action, Closure $next): mixed
     {
-        $cacheConfig = $this->resolveCacheConfig($action);
+        $prefix = config('actions.cache.prefix', 'action');
+        $cacheConfig = $this->resolveCacheConfig($action, $prefix);
 
         if ($cacheConfig === null) {
             return $next($action);
@@ -46,7 +47,7 @@ final class CacheMiddleware implements Middleware
         $lock = ['seconds' => 10, 'owner' => uniqid('query_cache_', true)];
 
         if (! app()->environment('testing') && method_exists(Cache::getStore(), 'tags')) {
-            return Cache::tags(['query', get_class($action)])
+            return Cache::tags([$prefix, get_class($action)])
                 ->flexible($cacheKey, [$freshTtl, $storageTtl], $callback, $lock);
         }
 
@@ -63,7 +64,7 @@ final class CacheMiddleware implements Middleware
      * @param  Action<TReturn>  $action
      * @return array{0: string, 1: int}|null [cacheKey, ttl] or null if not cacheable
      */
-    private function resolveCacheConfig(Action $action): ?array
+    private function resolveCacheConfig(Action $action, string $prefix): ?array
     {
         if ($action instanceof CacheableContract) {
             return [$action->cacheKey(), $action->cacheTtl()];
@@ -75,7 +76,7 @@ final class CacheMiddleware implements Middleware
             return null;
         }
 
-        return [$this->generateCacheKey($action, $attribute), $attribute->ttl];
+        return [$this->generateCacheKey($action, $attribute, $prefix), $attribute->ttl];
     }
 
     /**
@@ -107,17 +108,17 @@ final class CacheMiddleware implements Middleware
      * @param  Cacheable  $attribute  The cacheable attribute
      * @return string The cache key
      */
-    private function generateCacheKey(Action $action, Cacheable $attribute): string
+    private function generateCacheKey(Action $action, Cacheable $attribute, string $prefix): string
     {
         if ($attribute->key !== null) {
-            return "query:{$attribute->key}";
+            return "{$prefix}:{$attribute->key}";
         }
 
         $actionClass = get_class($action);
         $actionParams = $this->serializeActionParams($action);
         $hash = md5($actionParams);
 
-        return "query:{$actionClass}:{$hash}";
+        return "{$prefix}:{$actionClass}:{$hash}";
     }
 
     /**

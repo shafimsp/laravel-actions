@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Cache;
 use ShafiMsp\Actions\Executor;
 use ShafiMsp\Actions\Middleware\CacheMiddleware;
+use ShafiMsp\Actions\Tests\Fixtures\CacheableAttributeAction;
+use ShafiMsp\Actions\Tests\Fixtures\CacheableAttributeWithKeyAction;
 use ShafiMsp\Actions\Tests\Fixtures\CacheableContractAction;
 use ShafiMsp\Actions\Tests\Fixtures\StringAction;
 
@@ -40,6 +42,49 @@ it('uses different cache keys for different contract parameters', function () {
 
     expect($result1)->toBe('v1');
     expect($result2)->toBe('v2');
+});
+
+it('uses default action prefix for attribute-based cache keys', function () {
+    $action = new CacheableAttributeWithKeyAction(value: 'test');
+
+    $this->executor->execute($action);
+
+    expect(Cache::has('action:my-custom-key'))->toBeTrue();
+});
+
+it('uses default action prefix for auto-generated cache keys', function () {
+    $action = new CacheableAttributeAction(value: 'test');
+
+    $this->executor->execute($action);
+
+    $hash = md5(serialize(['value' => 'test']));
+    $expectedKey = 'action:'.CacheableAttributeAction::class.':'.$hash;
+
+    expect(Cache::has($expectedKey))->toBeTrue();
+});
+
+it('uses custom cache prefix from config for attribute key', function () {
+    config(['actions.cache.prefix' => 'custom']);
+
+    $action = new CacheableAttributeWithKeyAction(value: 'test');
+
+    $this->executor->execute($action);
+
+    expect(Cache::has('custom:my-custom-key'))->toBeTrue();
+    expect(Cache::has('action:my-custom-key'))->toBeFalse();
+});
+
+it('uses custom cache prefix from config for auto-generated key', function () {
+    config(['actions.cache.prefix' => 'custom']);
+
+    $action = new CacheableAttributeAction(value: 'test');
+
+    $this->executor->execute($action);
+
+    $hash = md5(serialize(['value' => 'test']));
+    $expectedKey = 'custom:'.CacheableAttributeAction::class.':'.$hash;
+
+    expect(Cache::has($expectedKey))->toBeTrue();
 });
 
 it('skips caching for actions without contract or attribute', function () {
