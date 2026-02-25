@@ -1,0 +1,48 @@
+{
+    "name": "shafimsp/laravel-actions",
+    "description": "An action executor with middleware pipeline for Laravel applications.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "illuminate/container": "^12.0",
+        "illuminate/pipeline": "^12.0",
+        "illuminate/support": "^12.0",
+        "spatie/laravel-data": "^4.0",
+        "spatie/laravel-package-tools": "^1.6"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ShafiMsp\\Actions\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ShafiMsp\\Actions\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ShafiMsp\\Actions\\ActionsServiceProvider"
+            ],
+            "aliases": {
+                "ActionExecutor": "ShafiMsp\\Actions\\Facades\\ActionExecutor"
+            }
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
