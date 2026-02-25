@@ -2,4 +2,5 @@
 
 use ShafiMsp\Actions\Tests\TestCase;
 
-uses(TestCase::class)->in('Unit');
+pest()->extend(TestCase::class)
+    ->in('Unit');
