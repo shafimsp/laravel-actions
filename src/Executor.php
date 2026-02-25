@@ -261,7 +261,7 @@ final class Executor implements Contracts\Executor
 
         $allowedTypes = array_diff($types, ['null']);
 
-        if (array_any($allowedTypes, fn (string $type) => $this->matchesType($result, $type))) {
+        if (count(array_filter($allowedTypes, fn (string $type) => $this->matchesType($result, $type))) > 0) {
             return $result;
         }
 
