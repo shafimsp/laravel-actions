@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace ShafiMsp\Actions\Middleware;
 
 use Closure;
+use Illuminate\Support\Facades\Cache;
+use ReflectionClass;
 use ShafiMsp\Actions\Attributes\Cacheable;
 use ShafiMsp\Actions\Contracts\Action;
 use ShafiMsp\Actions\Contracts\Cacheable as CacheableContract;
 use ShafiMsp\Actions\Contracts\Middleware;
-use Illuminate\Support\Facades\Cache;
-use ReflectionClass;
 
 /**
  * Middleware to cache query results.

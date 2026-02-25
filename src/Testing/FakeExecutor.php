@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace ShafiMsp\Actions\Testing;
 
 use Closure;
+use PHPUnit\Framework\Assert as PHPUnit;
 use ShafiMsp\Actions\Contracts\Action;
 use ShafiMsp\Actions\Contracts\Executor;
-use PHPUnit\Framework\Assert as PHPUnit;
 
 final class FakeExecutor implements Executor
 {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ShafiMsp\Actions\Tests;
 
-use ShafiMsp\Actions\ActionsServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
+use ShafiMsp\Actions\ActionsServiceProvider;
 
 class TestCase extends Orchestra
 {

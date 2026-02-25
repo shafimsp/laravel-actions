@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace ShafiMsp\Actions\Facades;
 
+use Illuminate\Support\Facades\Facade;
 use ShafiMsp\Actions\Contracts\Executor;
 use ShafiMsp\Actions\Testing\FakeExecutor;
-use Illuminate\Support\Facades\Facade;
 
 /**
  * @see \ShafiMsp\Actions\Executor

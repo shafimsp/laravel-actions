@@ -1,12 +1,12 @@
 <?php
 
+use PHPUnit\Framework\ExpectationFailedException;
 use ShafiMsp\Actions\Facades\ActionExecutor;
 use ShafiMsp\Actions\Testing\FakeExecutor;
 use ShafiMsp\Actions\Tests\Fixtures\ObjectAction;
 use ShafiMsp\Actions\Tests\Fixtures\ResultObject;
 use ShafiMsp\Actions\Tests\Fixtures\StringAction;
 use ShafiMsp\Actions\Tests\Fixtures\VoidAction;
-use PHPUnit\Framework\ExpectationFailedException;
 
 afterEach(fn () => ActionExecutor::clearResolvedInstances());
 
