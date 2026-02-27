@@ -99,7 +99,7 @@ final class Executor implements Contracts\Executor
     }
 
     /**
-     * Resolve the return type from an action class's {@extends} or {@implements} docblock.
+     * Resolve the return type from an action class's {@implements} docblock.
      *
      * This is public static so the actions:cache command can use it.
      */

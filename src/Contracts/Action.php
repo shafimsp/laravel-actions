@@ -8,14 +8,14 @@ namespace ShafiMsp\Actions\Contracts;
  * Interface for action objects in the CQRS pattern.
  *
  * Actions represent intentions to change application state.
- * Each action should specify its return type via the @extends docblock.
+ * Each action should specify its return type via the @implements docblock.
  *
  * @example
  *
- * /** @extends Action<User> *​/
- * final class FindUserQuery extends Action { ... }
- * /** @extends Action<User|null> *​/
- * final class FindOptionalUserQuery extends Action { ... }
+ * /** @implements Action<User> *​/
+ * final class FindUserQuery implements Action { ... }
+ * /** @implements Action<User|null> *​/
+ * final class FindOptionalUserQuery implements Action { ... }
  *
  * @template TReturn The return type of the action
  */
