@@ -101,6 +101,22 @@ it('fails when count does not match', function () {
     ActionExecutor::assertExecutedTimes(StringAction::class, 3);
 })->throws(ExpectationFailedException::class);
 
+// --- assertExecutedWith ---
+
+it('asserts an action was executed with matching properties', function () {
+    ActionExecutor::fake();
+    ActionExecutor::execute(new StringAction('match-me'));
+
+    ActionExecutor::assertExecutedWith(StringAction::class, ['value' => 'match-me']);
+});
+
+it('fails when properties do not match', function () {
+    ActionExecutor::fake();
+    ActionExecutor::execute(new StringAction('other'));
+
+    ActionExecutor::assertExecutedWith(StringAction::class, ['value' => 'no-match']);
+})->throws(ExpectationFailedException::class);
+
 // --- assertNotExecuted ---
 
 it('asserts an action was not executed', function () {

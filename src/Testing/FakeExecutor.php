@@ -86,6 +86,25 @@ final class FakeExecutor implements Executor
     }
 
     /**
+     * Assert that an action was executed with matching properties.
+     *
+     * @param  class-string<Action>  $actionClass
+     * @param  array<string, mixed>  $properties
+     */
+    public function assertExecutedWith(string $actionClass, array $properties): void
+    {
+        $this->assertExecuted($actionClass, function (Action $action) use ($properties): bool {
+            foreach ($properties as $key => $value) {
+                if (! property_exists($action, $key) || $action->{$key} !== $value) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }
+
+    /**
      * Assert that an action was not executed.
      *
      * @param  class-string<Action>  $actionClass

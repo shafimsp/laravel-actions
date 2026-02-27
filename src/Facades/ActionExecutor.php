@@ -15,6 +15,7 @@ use ShafiMsp\Actions\Testing\FakeExecutor;
  * @method static mixed execute(\ShafiMsp\Actions\Contracts\Action $action)
  * @method static \ShafiMsp\Actions\Contracts\Executor pushMiddleware(string|callable $middleware)
  * @method static void assertExecuted(string $actionClass, \Closure|int|null $callback = null)
+ * @method static void assertExecutedWith(string $actionClass, array $properties)
  * @method static void assertExecutedTimes(string $actionClass, int $times = 1)
  * @method static void assertNotExecuted(string $actionClass, ?\Closure $callback = null)
  * @method static void assertNothingExecuted()
