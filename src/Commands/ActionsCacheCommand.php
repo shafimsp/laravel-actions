@@ -90,6 +90,10 @@ class ActionsCacheCommand extends Command
 
     /**
      * Extract the fully qualified class name from a file path.
+     *
+     * Only matches class declarations (not enums, traits, or interfaces).
+     * This is intentional — discoverActions() filters by the Action interface,
+     * so non-class types are naturally excluded.
      */
     private function classFromFile(string $path): ?string
     {
