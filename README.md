@@ -4,8 +4,8 @@ A lightweight action executor with middleware pipeline for Laravel applications.
 
 ## Requirements
 
-- PHP 8.1+
-- Laravel 10.x, 11.x, or 12.x
+- PHP 8.2+
+- Laravel 11.x or 12.x
 
 ## Installation
 
