@@ -35,6 +35,13 @@ final class Executor implements Contracts\Executor
     private static array $returnTypeCache = [];
 
     /**
+     * Cached use statement mappings, keyed by file path.
+     *
+     * @var array<string, array<string, string>>
+     */
+    private static array $useStatementCache = [];
+
+    /**
      * Whether the bootstrap cache has been loaded.
      */
     private static bool $cacheLoaded = false;
@@ -135,6 +142,7 @@ final class Executor implements Contracts\Executor
     {
         self::$handlerCache = [];
         self::$returnTypeCache = [];
+        self::$useStatementCache = [];
         self::$cacheLoaded = false;
     }
 
@@ -205,15 +213,11 @@ final class Executor implements Contracts\Executor
             return ltrim($type, '\\');
         }
 
-        // Try to resolve from use statements by reading the file
-        $fileName = $reflection->getFileName();
+        // Try to resolve from use statements (cached per file)
+        $useStatements = self::parseUseStatements($reflection);
 
-        if ($fileName !== false) {
-            $contents = file_get_contents($fileName);
-
-            if ($contents !== false && preg_match('/^use\s+([\w\\\\]*\\\\'.preg_quote($type, '/').');/m', $contents, $useMatch)) {
-                return $useMatch[1];
-            }
+        if (isset($useStatements[$type])) {
+            return $useStatements[$type];
         }
 
         // Fall back to the action's namespace
@@ -228,6 +232,37 @@ final class Executor implements Contracts\Executor
         }
 
         return $type;
+    }
+
+    /**
+     * Parse and cache use statements from an action class file.
+     *
+     * @return array<string, string> Map of short name to fully qualified class name
+     */
+    private static function parseUseStatements(ReflectionClass $reflection): array
+    {
+        $fileName = $reflection->getFileName();
+
+        if ($fileName === false) {
+            return [];
+        }
+
+        if (isset(self::$useStatementCache[$fileName])) {
+            return self::$useStatementCache[$fileName];
+        }
+
+        $contents = file_get_contents($fileName);
+        $statements = [];
+
+        if ($contents !== false && preg_match_all('/^use\s+([\w\\\\]+);/m', $contents, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $fqcn = $match[1];
+                $shortName = substr($fqcn, strrpos($fqcn, '\\') + 1);
+                $statements[$shortName] = $fqcn;
+            }
+        }
+
+        return self::$useStatementCache[$fileName] = $statements;
     }
 
     /**
