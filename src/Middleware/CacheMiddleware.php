@@ -44,7 +44,7 @@ final class CacheMiddleware implements Middleware
         $freshTtl = $ttl;
         $storageTtl = $ttl * 3;
         $callback = static fn () => $next($action);
-        $lock = ['seconds' => 10, 'owner' => uniqid('query_cache_', true)];
+        $lock = ['seconds' => 10, 'owner' => gethostname().':'.getmypid().':'.uniqid('', true)];
 
         if (! app()->environment('testing') && method_exists(Cache::getStore(), 'tags')) {
             return Cache::tags([$prefix, get_class($action)])
